@@ -1,0 +1,15 @@
+1. exp spent = 0
+2. crafting gold = 42000
+3. crafting mats = 42 0 0 0 
+4. tier = Heroic
+5. base = 473
+6. type = Boots
+7. name = Abyss Drake Boots
+8. level = 0
+9. set = Speed Set
+10. main = %Health: 12
+Health: 158
+%Attack: 8
+%Effectiveness: 7
+ 
+ 

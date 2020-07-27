@@ -1,0 +1,14 @@
+1. exp spent = 968954
+2. crafting gold = 6482000
+3. crafting mats = 0 0 5082 0 
+4. tier = Heroic
+5. base = 473
+6. type = Boots
+7. name = Hellish Essence Treads
+8. level = 15
+9. set = Destruction Set
+10. main = %Health: 12
+%Effect_Resistance: 10
+Speed: 10
+%Attack: 7
+Health: 331
