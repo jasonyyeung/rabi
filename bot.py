@@ -10,6 +10,7 @@ import mimetypes
 import requests
 import re
 import json
+import os
 from discord.ext import commands
 
 rabi_sad = False
@@ -1177,10 +1178,13 @@ async def find_url(string):
     return [x[0] for x in url] 
 
 ## I hate my entire guild
-myjsonfile = open('config.json', 'r')
-data = myjsonfile.read()
-myjsonfile.close()
-config = json.loads(data)
-client.run(config['token'])
+##myjsonfile = open('config.json', 'r')
+##data = myjsonfile.read()
+##myjsonfile.close()
+##config = json.loads(data)
+##client.run(config['token'])
+
+client.run(str(os.environ.get('TOKEN')))
+
 
 
