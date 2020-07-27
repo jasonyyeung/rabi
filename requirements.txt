@@ -1,0 +1,3 @@
+git=https://github.com/jasonyyeung/rabi
+discord
+requests
