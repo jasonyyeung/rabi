@@ -18,11 +18,11 @@ from rabi import Rabi
 ## Stuff
 bot = commands.Bot(command_prefix = 'rabi ')
 s3_get = boto3.resource('s3',
-                        aws_access_key_id = Rabi.ACCESS_KEY,
-                        aws_secret_access_key = Rabi.SECRET_ACCESS_KEY)
+                        aws_access_key_id = str(os.environ.get('ACCESS_KEY')),
+                        aws_secret_access_key = str(os.environ.get('SECRET_ACCESS_KEY')))
 s3_put = boto3.client('s3',
-                      aws_access_key_id = Rabi.ACCESS_KEY,
-                      aws_secret_access_key = Rabi.SECRET_ACCESS_KEY)
+                      aws_access_key_id = str(os.environ.get('ACCESS_KEY')),
+                      aws_secret_access_key = str(os.environ.get('SECRET_ACCESS_KEY')))
 
 
 @bot.event
@@ -163,4 +163,4 @@ async def hit_rabi(message):
             
 
 ## Run
-bot.run(Rabi.TOKEN)
+bot.run(str(os.environ.get('TOKEN')))
