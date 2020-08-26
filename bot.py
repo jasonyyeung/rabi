@@ -35,7 +35,14 @@ async def on_ready():
 async def on_message(message):
 
     if not message.author.bot: #avoids infinite loops
+
+        ## Misc. commands
+        await hi_rabi(message)
+        await kill_rabi(message)
+        await hit_rabi(message)
+        #await ssb_user(message)
         await detect_keywords(message)
+        
         await bot.process_commands(message)
 
 
@@ -56,12 +63,11 @@ async def get_bucket(path):
 ## Takes in dictionary, puts json file to bucket
 async def put_bucket(file_name, dictionary, server_id):
 
-    ## Create file
     with open(file_name, 'w') as fp:
         json.dump(dictionary, fp)
 
-    ## Upload file
     s3_put.upload_file(file_name, 'rabi-bucket', f'{server_id}/{file_name}')
+    os.remove(file_name)
     
 
 ## Checks if message is a command before searching for keywords
@@ -87,10 +93,6 @@ async def detect_keywords(message):
                 if await findWholeWord(keyword, text) and not await rabi_sad(message.guild.id):
                     await message.channel.send(reaction)
                     break
-        
-    await hi_rabi(message)
-    await kill_rabi(message)
-    #await ssb_user(message)
 
 
 ## Finding words in a sentence
@@ -98,7 +100,7 @@ async def findWholeWord(w, s):
     return f' {w} ' in f' {s} '
 
 
-## Separate case for rabi and arabi
+## Special case for rabi and arabi
 async def find_rabi(message):
 
     rabi = False
@@ -109,17 +111,17 @@ async def find_rabi(message):
     double_rabi = ["double ravi", "double rabi", "rabis", "ravis"]
 
     for keyword in double_rabi:
-        if await findWholeWord(keyword, message.content.lower()):
+        if await findWholeWord(keyword, message.content.lower() and not await rabi_sad(message.guild.id)):
             await message.channel.send('<:rabi:646666830651326464><:arabi:648411271334461449>')
             return
 
     for keyword in rabi_keys:
-        if await findWholeWord(keyword, message.content.lower()):
+        if await findWholeWord(keyword, message.content.lower() and not await rabi_sad(message.guild.id)):
             rabi = True
             break
 
     for keyword in arabi_keys:
-        if await findWholeWord(keyword, message.content.lower()):
+        if await findWholeWord(keyword, message.content.lower() and not await rabi_sad(message.guild.id)):
             arabi = True
             break
 
@@ -148,7 +150,17 @@ async def kill_rabi(message):
         data = {'status': True}
         await put_bucket('rabi_sad.json', data, message.guild.id)
         await message.channel.send('<:rabidrink:665760786462933012>')
-    
+
+
+## Fun feature, 30% to counter
+async def hit_rabi(message):
+    if message.content.lower() == 'hit rabi' or message.content.lower() == 'hit ravi':
+        if random.random() < 0.3:
+            await message.channel.send('COUNTER ATTAC')
+            await message.channel.send('<:rabiflame:648713302360326148>')
+        else:
+            await message.channel.send('<:rabicry:650976531354615819>')
+            
 
 ## Run
 bot.run(Rabi.TOKEN)
