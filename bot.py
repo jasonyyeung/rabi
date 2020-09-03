@@ -35,7 +35,7 @@ async def on_message(message):
 ## Data storage
 async def postgres_connect():
     
-    url = urlparse.urlparse(Rabi.DATABASE_URL)
+    url = urlparse.urlparse(os.environ.get('DATABASE_URL'))
     dbname = url.path[1:]
     user = url.username
     password = url.password
@@ -206,5 +206,5 @@ async def hit_rabi(message):
             
 
 ## Run
-##bot.run(str(os.environ.get('TOKEN')))
-bot.run(Rabi.TOKEN)
+bot.run(os.environ.get('TOKEN'))
+##bot.run(Rabi.TOKEN)
