@@ -12,3 +12,10 @@ class Rabi:
         }
 
     COMMANDS = ['hi rabi', 'kill rabi', 'hit rabi', 'ssbuser?']
+
+    RABI = {
+        "<:rabi:646666830651326464><:arabi:648411271334461449>": ['double ravi', 'double rabi', 'rabis', 'ravis'],
+        "<:rabi:646666830651326464>": ['ravi', 'rabi'],
+        "<:arabi:648411271334461449>": ['mlravi', 'ml ravi', 'ml rabi', 'mlrabi', 'aravi', 'arabi', 'a.rabi', 'a.ravi']
+        }
+        

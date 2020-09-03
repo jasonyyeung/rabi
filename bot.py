@@ -2,27 +2,14 @@
 
 ## Imports
 import discord
-import linecache
 import random
-import datetime
-import mimetypes
-import requests
-import re
-import json
 import os
-import boto3
+import psycopg2
 from discord.ext import commands
 from rabi import Rabi
+import urllib.parse as urlparse
 
-
-## Stuff
 bot = commands.Bot(command_prefix = 'rabi ')
-s3_get = boto3.resource('s3',
-                        aws_access_key_id = str(os.environ.get('ACCESS_KEY')),
-                        aws_secret_access_key = str(os.environ.get('SECRET_ACCESS_KEY')))
-s3_put = boto3.client('s3',
-                      aws_access_key_id = str(os.environ.get('ACCESS_KEY')),
-                      aws_secret_access_key = str(os.environ.get('SECRET_ACCESS_KEY')))
 
 
 @bot.event
@@ -37,8 +24,7 @@ async def on_message(message):
     if not message.author.bot: #avoids infinite loops
 
         ## Misc. commands
-        await hi_rabi(message)
-        await kill_rabi(message)
+        await set_reaction(message)
         await hit_rabi(message)
         #await ssb_user(message)
         await detect_keywords(message)
@@ -46,28 +32,73 @@ async def on_message(message):
         await bot.process_commands(message)
 
 
-## Keyword detected, checks rabi_mood from s3 before sending message
-async def rabi_sad(server_id):
-    json_content = await get_bucket(f'{server_id}/rabi_sad.json')
-    return json_content['status']
-
-
-## Sends get request, returns dictionary
-async def get_bucket(path):
+## Data storage
+async def postgres_connect():
     
-    content_object = s3_get.Object('rabi-bucket', path)
-    file_content = content_object.get()['Body'].read().decode('utf-8')
-    return json.loads(file_content)
+    url = urlparse.urlparse(Rabi.DATABASE_URL)
+    dbname = url.path[1:]
+    user = url.username
+    password = url.password
+    host = url.hostname
+    port = url.port
+
+    conn = psycopg2.connect(
+        dbname=dbname,
+        user=user,
+        password=password,
+        host=host,
+        port=port
+        )
+
+    return conn
+
+async def open_table(command, mode):
+    
+    conn = await postgres_connect()
+    cur = conn.cursor()
+    cur.execute(command)
+    data = None
+
+    ## 0: commit, 1: fetchone, 2: fetchall
+    if mode == 1: data = cur.fetchone() #list representing a row
+    if mode == 2: data = cur.fetchall() #list of lists
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    return data
 
 
-## Takes in dictionary, puts json file to bucket
-async def put_bucket(file_name, dictionary, server_id):
+## Keyword detected, check postgres for reaction status
+async def rabi_reactions(server_id):
 
-    with open(file_name, 'w') as fp:
-        json.dump(dictionary, fp)
+    ## Check if table and row exists
+    check1 = "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name = 'rabi_reactions')"
+    check2 = f"SELECT EXISTS(SELECT * FROM rabi_reactions WHERE server_id = '{server_id}')"
+    create = "CREATE TABLE rabi_reactions (server_id TEXT, status boolean)"
+    select = f"SELECT * FROM rabi_reactions WHERE server_id = '{server_id}'"
 
-    s3_put.upload_file(file_name, 'rabi-bucket', f'{server_id}/{file_name}')
-    os.remove(file_name)
+    if (await open_table(check1, 1))[0]:
+        if (await open_table(check2, 1))[0]:
+
+            ## Get status
+            return (await open_table(select, 1))[1]
+
+        ## Reactions enabled by default
+        else:
+            return True
+
+    ## Create table
+    else:
+        try:
+            await open_table(create, 0)
+
+        ## In case a table was created with 0 entries
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+
+        ## Default setting
+        return True
     
 
 ## Checks if message is a command before searching for keywords
@@ -90,7 +121,7 @@ async def detect_keywords(message):
         
         for reaction in Rabi.REACTIONS:
             for keyword in Rabi.REACTIONS[reaction]:
-                if await findWholeWord(keyword, text) and not await rabi_sad(message.guild.id):
+                if await findWholeWord(keyword, text) and await rabi_reactions(message.guild.id):
                     await message.channel.send(reaction)
                     break
 
@@ -102,60 +133,72 @@ async def findWholeWord(w, s):
 
 ## Special case for rabi and arabi
 async def find_rabi(message):
+    
+    text = message.content.lower()
+    response = ''
 
-    rabi = False
-    rabi_keys = ['ravi', 'rabi']
-    arabi = False
-    arabi_keys = ['arabi', 'mlravi', 'ml ravi', 'ml rabi', 'mlrabi',
-                  'aravi', 'arabi', 'a.rabi', 'a.ravi']
-    double_rabi = ["double ravi", "double rabi", "rabis", "ravis"]
-
-    for keyword in double_rabi:
-        if await findWholeWord(keyword, message.content.lower() and not await rabi_sad(message.guild.id)):
-            await message.channel.send('<:rabi:646666830651326464><:arabi:648411271334461449>')
+    for emote in Rabi.RABI:
+        for keyword in Rabi.RABI[emote]:
+            if await findWholeWord(keyword, text) and await rabi_reactions(message.guild.id):
+                response += emote
+                break
+        if response == '<:rabi:646666830651326464><:arabi:648411271334461449>':
+            await message.channel.send(response)
             return
-
-    for keyword in rabi_keys:
-        if await findWholeWord(keyword, message.content.lower() and not await rabi_sad(message.guild.id)):
-            rabi = True
-            break
-
-    for keyword in arabi_keys:
-        if await findWholeWord(keyword, message.content.lower() and not await rabi_sad(message.guild.id)):
-            arabi = True
-            break
-
-    if rabi and arabi:
-        await message.channel.send('<:rabi:646666830651326464><:arabi:648411271334461449>')
-        return
-        
-    if rabi:
-        await message.channel.send('<:rabi:646666830651326464>')
-
-    if arabi:
-        await message.channel.send('<:arabi:648411271334461449>') 
+    if len(response) > 0:
+        await message.channel.send(response)
 
 
-## Enables reactions
-async def hi_rabi(message):
-    if message.content.lower() == 'hi rabi' or message.content.lower() == 'hi ravi':
-        data = {'status': False}
-        await put_bucket('rabi_sad.json', data, message.guild.id)
+## Enables and disables reactions
+async def set_reaction(message):
+
+    text = message.content.lower()
+    
+    if text == 'hi rabi' or text == 'hi ravi':
         await message.channel.send('<:rabiwave:648711649838235658>')
+        reaction = True
 
-
-## Disables reactions
-async def kill_rabi(message):
-    if message.content.lower() == 'kill rabi' or message.content.lower() == 'kill ravi':
-        data = {'status': True}
-        await put_bucket('rabi_sad.json', data, message.guild.id)
+    elif text == 'kill rabi' or text == 'kill ravi':
         await message.channel.send('<:rabidrink:665760786462933012>')
+        reaction = False
+
+    else:
+        return
+
+    ## Check tables and rows
+    server_id = message.guild.id
+    check1 = "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name = 'rabi_reactions')"
+    check2 = f"SELECT EXISTS(SELECT * FROM rabi_reactions WHERE server_id = '{server_id}')"
+    create = "CREATE TABLE rabi_reactions (server_id TEXT, status boolean)"
+    add = f"INSERT INTO rabi_reactions(server_id, status) VALUES('{server_id}', {reaction})"
+    update = f"UPDATE rabi_reactions SET status = {reaction} WHERE server_id = '{server_id}'"
+
+    ## Table exists
+    if (await open_table(check1, 1))[0]:
+        if (await open_table(check2, 1))[0]:
+            await open_table(update, 0)
+        else:
+            await open_table(add, 0)
+
+    ## Table may or may not exist
+    else:
+        try:
+            await open_table(add, 0)
+
+        ## Table does not exist, create one, then a new row
+        except (Exception, psycopg2.DatabaseError) as error:
+            await open_table(create, 0)
+            await open_table(add, 0)
+            
+            print(error)
 
 
-## Fun feature, 30% to counter
+## Fun feature, 20% to counter
 async def hit_rabi(message):
     if message.content.lower() == 'hit rabi' or message.content.lower() == 'hit ravi':
-        if random.random() < 0.3:
+        value = random.random()
+        print(value)
+        if value < 0.2:
             await message.channel.send('COUNTER ATTAC')
             await message.channel.send('<:rabiflame:648713302360326148>')
         else:
@@ -163,4 +206,5 @@ async def hit_rabi(message):
             
 
 ## Run
-bot.run(str(os.environ.get('TOKEN')))
+##bot.run(str(os.environ.get('TOKEN')))
+bot.run(Rabi.TOKEN)

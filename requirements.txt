@@ -1,3 +1,2 @@
 discord.py
-requests
-boto3
+psycopg2-binary
