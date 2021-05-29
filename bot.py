@@ -275,7 +275,39 @@ async def time(ctx):
                    "UTC: " + utc.strftime('%#I:%M %p') + "\n" +
                    "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
     
+    
+# Command for rabi to remind someone
+@bot.command()
+async def remind(ctx, time, *, task):
+    def convert(time):
+        form = ['s', 'm', 'h', 'd']
 
+        time_dict = {"s": 1, "m": 60, "h": 3600, "d": 3600*24}
+
+        unit = time[-1]
+
+        if unit not in form:
+            return -1
+        try:
+            val = int(time[:-1])
+        except:
+            return -2
+        
+        return val * time_dict[unit]
+
+    parsed_time = convert(time)
+
+    if parsed_time == -1:
+        await ctx.send("pls specify s/m/h/d")
+        return
+    if parsed_time == -2:
+        await ctx.send("pls giv number")
+        return
+
+    await ctx.send(f"your reminder for **{task}** has been recorded and i will remind you in **{time}** <:rabikewl:846747935752454155>")
+    await asyncio.sleep(parsed_time)
+    await ctx.send(f"<:rabiwave:648711649838235658> {ctx.author.mention}, here's your reminder for **{task}**")
+    
 
 ## Sends an automatic message at regular intervals
 ##async def background_task():
