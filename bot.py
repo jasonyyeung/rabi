@@ -278,7 +278,7 @@ async def time(ctx):
     
 # Command for rabi to remind someone
 @bot.command()
-async def remind(ctx, time, *, task):
+async def remindme(ctx, time, *, task):
     def convert(time):
         form = ['s', 'm', 'h', 'd']
 
