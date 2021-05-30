@@ -203,10 +203,10 @@ async def hit_rabi(message):
     if message.content.lower() == 'hit rabi' or message.content.lower() == 'hit ravi':
         value = random.random()
 
-        if value < 1:
+        if value < 0.2:
             await message.channel.send('COUNTER ATTAC <:rabiflame:648713302360326148>')
             value2 = random.random()
-            if value2 < 1:
+            if value2 < 0.35:
                 perms = message.channel.overwrites_for(message.author)
                 await message.channel.send('STUN PROCC')
                 await message.channel.set_permissions(message.author, send_messages=False)
