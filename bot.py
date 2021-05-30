@@ -207,7 +207,7 @@ async def hit_rabi(message):
             await message.channel.send('COUNTER ATTAC <:rabiflame:648713302360326148>')
             value2 = random.random()
             if value2 < 1:
-                perms = ctx.channel.overwrites_for(ctx.author)
+                perms = message.channel.overwrites_for(message.channel.author)
                 await message.channel.send('STUN PROCC')
                 await message.channel.set_permissions(message.channel.author, send_messages=False)
                 await asyncio.sleep(30)
