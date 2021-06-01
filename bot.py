@@ -330,7 +330,7 @@ async def gw_timer(message):
             # rabi bot lives in UTC, and maint happens in 3am UTC
             dt3 = datetime(tomorrow.year, tomorrow.month, tomorrow.day, 3, 0 , 0, 0)
             # 5 hrs notice for guild members
-            diff = dt3 - cur_time - timedelta(hours=2)
+            diff = dt3 - cur_time - timedelta(hours=5)
             # which channel to post in 
             channel1 = discord.utils.get(message.guild.text_channels, name="bot-channel")
             await channel1.send(f"sending a gw reminder in {diff.total_seconds()} seconds")
