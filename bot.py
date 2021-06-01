@@ -276,11 +276,13 @@ async def time(ctx):
     steph = datetime.now(timezone('Australia/Brisbane'))
     utc = datetime.now(timezone('UTC'))
     edt = datetime.now(timezone('Canada/Eastern'))
+    bottz = datetime.now()
     
     await ctx.send("Chow: " + chow.strftime('%#I:%M %p') + "\n" +
                    "Steph: " + steph.strftime('%#I:%M %p') + "\n" +
                    "UTC: " + utc.strftime('%#I:%M %p') + "\n" +
-                   "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
+                   "Rabi: " + edt.strftime('%#I:%M %p') + "\n" + 
+                   "BOT TIMEZONE: " + bottz.strftime('%#I:%M %p') + "\n")
     
     
 # Command for rabi to remind someone
