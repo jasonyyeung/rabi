@@ -6,7 +6,7 @@ import random
 import os
 import psycopg2
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone 
 import asyncio
 from discord.ext import commands
@@ -32,6 +32,7 @@ async def on_message(message):
         await set_reaction(message)
         await hit_rabi(message)
         await detect_keywords(message)
+        await gw_timer(message)
         
         await bot.process_commands(message)
 
@@ -198,7 +199,7 @@ async def set_reaction(message):
             print(error)
 
 
-## Fun feature, 20% to counter
+## Fun feature, 20% to counter into 35% to mute user
 async def hit_rabi(message):
     if message.content.lower() == 'hit rabi' or message.content.lower() == 'hit ravi':
         value = random.random()
@@ -276,13 +277,11 @@ async def time(ctx):
     steph = datetime.now(timezone('Australia/Brisbane'))
     utc = datetime.now(timezone('UTC'))
     edt = datetime.now(timezone('Canada/Eastern'))
-    bottz = datetime.now()
     
     await ctx.send("Chow: " + chow.strftime('%#I:%M %p') + "\n" +
                    "Steph: " + steph.strftime('%#I:%M %p') + "\n" +
                    "UTC: " + utc.strftime('%#I:%M %p') + "\n" +
-                   "Rabi: " + edt.strftime('%#I:%M %p') + "\n" + 
-                   "BOT TIMEZONE: " + bottz.strftime('%#I:%M %p') + "\n")
+                   "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
     
     
 # Command for rabi to remind someone
@@ -317,7 +316,29 @@ async def remindme(ctx, time, *, task):
     await asyncio.sleep(parsed_time)
     await ctx.send(f"<:rabiwave:648711649838235658> {ctx.author.mention}, here's your reminder for **{task}**")
     
-
+    
+# To listen for maintenance notice in e7-news, then promptly remind friends 5 hrs early to do their gws before maint hits
+async def gw_timer(message):
+    if "mic-muted" in message.channel.name:
+        if 'Maintenance Notice' in message.content:
+            await message.channel.send("maint detected, beginning countdown")
+            # grab current time
+            cur_time = datetime.now()
+            # grab current time + 1 day
+            day = timedelta(days=1)
+            tomorrow = cur_time + day 
+            # rabi bot lives in UTC, and maint happens in 3am UTC
+            dt3 = datetime(tomorrow.year, tomorrow.month, tomorrow.day, 3, 0 , 0, 0)
+            # 5 hrs notice for guild members
+            diff = dt3 - cur_time - timedelta(hours=2)
+            # which channel to post in 
+            channel1 = discord.utils.get(message.guild.text_channels, name="bot-channel")
+            await channel1.send(f"sending a gw reminder in {diff.total_seconds()} seconds")
+            await asyncio.sleep(diff.total_seconds())
+            await channel1.send("(if this message is posted hooray!!) rabi is here to remind everyone there is a maint in 5 hrs, int your attacks soon")
+            await channel1.send("<:rabifighting:703995623350730812>")
+    
+    
 ## Sends an automatic message at regular intervals
 ##async def background_task():
 ##    
