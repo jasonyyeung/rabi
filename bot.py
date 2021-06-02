@@ -319,9 +319,9 @@ async def remindme(ctx, time, *, task):
     
 # To listen for maintenance notice in e7-news, then promptly remind friends 5 hrs early to do their gws before maint hits
 async def gw_timer(message):
-    if "mic-muted" in message.channel.name:
+    if "e7-news" in message.channel.name:
         if 'Maintenance Notice' in message.content:
-            await message.channel.send("maint detected, beginning countdown")
+            await message.channel.send("<:rabilurk:836261305916456970>")
             # grab current time
             cur_time = datetime.now()
             # grab current time + 1 day
@@ -332,11 +332,10 @@ async def gw_timer(message):
             # 5 hrs notice for guild members
             diff = dt3 - cur_time - timedelta(hours=5)
             # which channel to post in 
-            channel1 = discord.utils.get(message.guild.text_channels, name="bot-channel")
-            await channel1.send(f"sending a gw reminder in {diff.total_seconds()} seconds")
+            gw_channel = discord.utils.get(message.guild.text_channels, name="guild-wars")
             await asyncio.sleep(diff.total_seconds())
-            await channel1.send("(if this message is posted hooray!!) rabi is here to remind everyone there is a maint in 5 hrs, int your attacks soon")
-            await channel1.send("<:rabifighting:703995623350730812>")
+            await gw_channel.send("rabi is here to remind everyone there is a maint in 5 hrs, int your attacks soon")
+            await gw_channel.send("<:rabifighting:703995623350730812>")
     
     
 ## Sends an automatic message at regular intervals
