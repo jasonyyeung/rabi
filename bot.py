@@ -282,8 +282,13 @@ async def time(ctx):
                    "Steph: " + steph.strftime('%#I:%M %p') + "\n" +
                    "UTC: " + utc.strftime('%#I:%M %p') + "\n" +
                    "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
-    
-    
+
+# itzwill lol
+@bot.command()
+async def thoughts(ctx):
+    await ctx.send("unfortunately it does not seem we have any vacant spots, we'll let you know if there's an opening")
+    await ctx.send("<:rabicry:650976531354615819>")
+
 # Command for rabi to remind someone
 @bot.command()
 async def remindme(ctx, time, *, task):
