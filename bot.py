@@ -286,7 +286,7 @@ async def time(ctx):
 # Create a thread every gw day
 @tasks.loop(minutes=5)
 async def called_once_a_day():
-    message_channel = bot.get_channel(848165364012679181)
+    message_channel = bot.get_channel(590177033586475008)
     # if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 datetime.today().isoweekday() == 5:
     if datetime.today().isoweekday() == 2:
         hi = await message_channel.send("its tuesday!!")
