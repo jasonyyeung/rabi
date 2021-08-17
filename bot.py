@@ -283,11 +283,21 @@ async def time(ctx):
                    "UTC: " + utc.strftime('%#I:%M %p') + "\n" +
                    "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
 
-# # itzwill lol
-# @bot.command()
-# async def thoughts(ctx):
-#     await ctx.send("unfortunately it does not seem we have any vacant spots, we'll let you know if there's an opening")
-#     await ctx.send("<:rabicry:650976531354615819>")
+# Create a thread every gw day
+@tasks.loop(minutes=5)
+async def called_once_a_day():
+    message_channel = bot.get_channel(848165364012679181)
+    # if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 datetime.today().isoweekday() == 5:
+    if datetime.today().isoweekday() == 2:
+        hi = await message_channel.send("its tuesday!!")
+        thread = await message_channel.create_thread(name="please be born", message=hi)
+    # else:
+    #     hi = await message_channel.send("TEST")
+    #     thread = await message_channel.create_thread(name="please be born", message=hi)
+
+@called_once_a_day.before_loop
+async def before():
+    await bot.wait_until_ready()
 
 # Command for rabi to remind someone
 @bot.command()
@@ -365,5 +375,6 @@ async def gw_timer(message):
     
 
 ## Run
+called_once_a_day.start()
 bot.run(os.environ.get('TOKEN'))
 ##bot.run(Arabi.TOKEN)
