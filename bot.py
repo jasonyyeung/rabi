@@ -9,7 +9,7 @@ import re
 from datetime import datetime, timedelta
 from pytz import timezone 
 import asyncio
-from discord.ext import commands
+from discord.ext import commands, tasks
 from rabi import Rabi
 #from arabi import Arabi
 import urllib.parse as urlparse
@@ -20,8 +20,11 @@ bot = commands.Bot(command_prefix = 'rabi ')
 @bot.event
 async def on_ready():
     await bot.change_presence(status = discord.Status.online, activity = discord.Game('Epic Seven'))
+    message_channel = bot.get_channel(590177033586475008)
+    hi = await message_channel.send("bot redeployed!")
+    await message_channel.create_thread(name="horay", message=hi)
+    called_once_a_day.start()
     print('rabi')
-
 
 @bot.event
 async def on_message(message):
@@ -284,20 +287,22 @@ async def time(ctx):
                    "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
 
 # Create a thread every gw day
-@tasks.loop(minutes=5)
+@tasks.loop(hours=24)
 async def called_once_a_day():
-    message_channel = bot.get_channel(848165364012679181)
+    message_channel = bot.get_channel(590177033586475008)
     # if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 datetime.today().isoweekday() == 5:
-    if datetime.today().isoweekday() == 2:
-        hi = await message_channel.send("its tuesday!!")
-        thread = await message_channel.create_thread(name="please be born", message=hi)
-    # else:
-    #     hi = await message_channel.send("TEST")
-    #     thread = await message_channel.create_thread(name="please be born", message=hi)
+    # message_channel = bot.get_channel(848165364012679181)
+    hi = await message_channel.send("THREAD CREATE PLEASE")
+    thread = await message_channel.create_thread(name="horay", message=hi)
 
 @called_once_a_day.before_loop
 async def before():
-    await bot.wait_until_ready()
+    for _ in range(60*60*24):  
+        if datetime.utcnow().strftime("%H:%M UTC") == "08:07 UTC":
+            return
+
+        # wait some time before another loop. Don't make it more than 60 sec or it will skip
+        await asyncio.sleep(30)
 
 # Command for rabi to remind someone
 @bot.command()
@@ -375,6 +380,5 @@ async def gw_timer(message):
     
 
 ## Run
-called_once_a_day.start()
 bot.run(os.environ.get('TOKEN'))
 ##bot.run(Arabi.TOKEN)
