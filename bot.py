@@ -22,7 +22,8 @@ async def on_ready():
     await bot.change_presence(status = discord.Status.online, activity = discord.Game('Epic Seven'))
     message_channel = bot.get_channel(590177033586475008)
     hi = await message_channel.send("bot redeployed!")
-    await message_channel.create_thread(name="horay", message=hi)
+    thread = await message_channel.create_thread(name="horay", message=hi)
+    await message_channel.send(thread)
     called_once_a_day.start()
     print('rabi')
 
