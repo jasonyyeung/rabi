@@ -297,7 +297,7 @@ async def called_once_a_day():
 @called_once_a_day.before_loop
 async def before():
     for _ in range(60*60*24):  
-        if datetime.utcnow().strftime("%H:%M UTC") == "08:02 UTC":
+        if datetime.utcnow().strftime("%H:%M UTC") == "08:07 UTC":
             return
 
         # wait some time before another loop. Don't make it more than 60 sec or it will skip
