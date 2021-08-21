@@ -293,8 +293,8 @@ async def called_once_a_day():
     message_channel = bot.get_channel(590177033586475008)
     # if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 datetime.today().isoweekday() == 5:
     # message_channel = bot.get_channel(848165364012679181)
-    hi = await message_channel.send("THREAD CREATE PLEASE")
-    thread = await message_channel.create_thread(name="horay", message=hi)
+    # hi = await message_channel.send("THREAD CREATE PLEASE")
+#     thread = await message_channel.create_thread(name="horay", message=hi)
 
 @called_once_a_day.before_loop
 async def before():
