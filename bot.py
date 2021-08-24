@@ -21,9 +21,9 @@ bot = commands.Bot(command_prefix = 'rabi ')
 async def on_ready():
     await bot.change_presence(status = discord.Status.online, activity = discord.Game('Epic Seven'))
     message_channel = bot.get_channel(590177033586475008)
-    hi = await message_channel.send("bot redeployed!")
-    thread = await message_channel.create_thread(name="horay", message=hi)
-    await message_channel.send(thread)
+#     hi = await message_channel.send("bot redeployed!")
+#     thread = await message_channel.create_thread(name="horay", message=hi)
+#     await message_channel.send(thread)
     called_once_a_day.start()
     print('rabi')
 
@@ -287,14 +287,20 @@ async def time(ctx):
                    "UTC: " + utc.strftime('%#I:%M %p') + "\n" +
                    "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
 
+@bot.command()
+async def make(ctx):
+    message_channel = ctx.channel
+    hi = await message_channel.send("I CREATE THREAD ALSO")
+    await message_channel.create_thread(name="horay", message=hi)
+    
 # Create a thread every gw day
 @tasks.loop(hours=24)
 async def called_once_a_day():
     message_channel = bot.get_channel(590177033586475008)
     # if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 datetime.today().isoweekday() == 5:
     # message_channel = bot.get_channel(848165364012679181)
-    hi = await message_channel.send("THREAD CREATE PLEASE")
-    thread = await message_channel.create_thread(name="horay", message=hi)
+    # hi = await message_channel.send("THREAD CREATE PLEASE")
+#     thread = await message_channel.create_thread(name="horay", message=hi)
 
 @called_once_a_day.before_loop
 async def before():
