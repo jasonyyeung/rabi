@@ -287,6 +287,12 @@ async def time(ctx):
                    "UTC: " + utc.strftime('%#I:%M %p') + "\n" +
                    "Rabi: " + edt.strftime('%#I:%M %p') + "\n")
 
+@bot.command()
+async def make(ctx):
+    message_channel = ctx.channel
+    hi = await message_channel.send("I CREATE THREAD ALSO")
+    await message_channel.create_thread(name="horay", message=hi)
+    
 # Create a thread every gw day
 @tasks.loop(hours=24)
 async def called_once_a_day():
