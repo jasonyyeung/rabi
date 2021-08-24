@@ -1,3 +1,3 @@
-discord.py==2.0.0a3470+gfeae059c
+discord.py
 psycopg2-binary
 pytz
