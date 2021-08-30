@@ -294,22 +294,26 @@ async def make(ctx):
     await message_channel.create_thread(name="horay", message=hi)
     
 # Create a thread every gw day
-@tasks.loop(hours=24)
-async def called_once_a_day():
+@tasks.loop(minutes=1)
+async def called_every_minute():
     message_channel = bot.get_channel(590177033586475008)
+    now= datetime.strftime(datetime.now(),'%H:%M')
+    print_now= datetime.strftime(datetime.now(), "%B %d")
+    await message_channel.send(f"now = {now}")
+    if now == '06:33':
+        hi = await message_channel.send("i love gw")
+        await message_channel.create_thread(name=f"{print_now} GW", message=hi)
+    # await message_channel.send(f"today is: {datetime.today()}")
     # if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 datetime.today().isoweekday() == 5:
-    # message_channel = bot.get_channel(848165364012679181)
-    # hi = await message_channel.send("THREAD CREATE PLEASE")
-#     thread = await message_channel.create_thread(name="horay", message=hi)
+    #     await message_channel.send(f"it is gw day!")
+    # else:
+    #     await message_channel.send(f"it is not gw day!")
 
-@called_once_a_day.before_loop
+
+@called_every_minute.before_loop
 async def before():
-    for _ in range(60*60*24):  
-        if datetime.utcnow().strftime("%H:%M UTC") == "08:07 UTC":
-            return
-
-        # wait some time before another loop. Don't make it more than 60 sec or it will skip
-        await asyncio.sleep(30)
+    await bot.wait_until_ready()
+    print("Finished waiting")
 
 # Command for rabi to remind someone
 @bot.command()
@@ -387,5 +391,6 @@ async def gw_timer(message):
     
 
 ## Run
+called_every_minute.start()
 bot.run(os.environ.get('TOKEN'))
 ##bot.run(Arabi.TOKEN)
