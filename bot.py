@@ -296,7 +296,7 @@ async def make(ctx):
 # Create a thread every gw day
 @tasks.loop(minutes=1)
 async def called_every_minute():
-    message_channel = bot.get_channel(590177033586475008)
+    message_channel = bot.get_channel(578736308961148978)
     now= datetime.strftime(datetime.now(),'%H:%M')
     print_now= datetime.strftime(datetime.now(), "%B %d")
     if now == '10:00':
