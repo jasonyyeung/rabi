@@ -299,7 +299,7 @@ async def called_every_minute():
     message_channel = bot.get_channel(590177033586475008)
     now= datetime.strftime(datetime.now(),'%H:%M')
     print_now= datetime.strftime(datetime.now(), "%B %d")
-    await message_channel.send(f"now = {now}")
+    # await message_channel.send(f"now = {now}")
     if now == '06:33':
         hi = await message_channel.send("i love gw")
         await message_channel.create_thread(name=f"{print_now} GW", message=hi)
