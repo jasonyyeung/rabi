@@ -299,21 +299,14 @@ async def called_every_minute():
     message_channel = bot.get_channel(590177033586475008)
     now= datetime.strftime(datetime.now(),'%H:%M')
     print_now= datetime.strftime(datetime.now(), "%B %d")
-    # await message_channel.send(f"now = {now}")
-    if now == '06:33':
-        hi = await message_channel.send("i love gw")
-        await message_channel.create_thread(name=f"{print_now} GW", message=hi)
-    # await message_channel.send(f"today is: {datetime.today()}")
-    # if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 datetime.today().isoweekday() == 5:
-    #     await message_channel.send(f"it is gw day!")
-    # else:
-    #     await message_channel.send(f"it is not gw day!")
-
+    if now == '10:00':
+        if datetime.today().isoweekday() == 1 or datetime.today().isoweekday() == 3 or datetime.today().isoweekday() == 5:
+            hi = await message_channel.send("i love gw")
+            await message_channel.create_thread(name=f"{print_now} GW", message=hi)
 
 @called_every_minute.before_loop
 async def before():
     await bot.wait_until_ready()
-    print("Finished waiting")
 
 # Command for rabi to remind someone
 @bot.command()
