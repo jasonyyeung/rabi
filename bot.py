@@ -31,6 +31,10 @@ async def on_ready():
 async def on_message(message):
 
     if not message.author.bot: #avoids infinite loops
+        
+        # sass
+        if 'No you don\'t'.lower() or 'No you dont'.lower() in message.content:
+            await message.channel.send("yes i do shut up")
 
         ## Misc. commands
         await set_reaction(message)
